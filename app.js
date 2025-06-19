@@ -22,10 +22,10 @@ app.get("/", (req, res) => {
 });
 
 app.post("/generate", upload.single("photo"), async (req, res) => {
-  const { name, class: className } = req.body;
+  const { name, class: className, position } = req.body;
   const photoBuffer = req.file.buffer;
 
-  const templatePath = path.join(__dirname, "public", "template.png"); // Corrected template name
+  const templatePath = path.join(__dirname, "public", "template.png");
   const fileName = `output-${Date.now()}.png`;
   const outputPath = path.join("public", "uploads", fileName);
 
@@ -68,7 +68,6 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
   const CERT_WIDTH = 768;
   const NAME_FONT_SIZE = 48;
   const CLASS_FONT_SIZE = 36;
- 
 
   const textSvg = `
     <svg width="${CERT_WIDTH}" height="120">
@@ -81,12 +80,37 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     </svg>
   `;
 
+  const BADGE_SIZE = 140;
+  const BADGE_LEFT = 880;
+  const BADGE_TOP = 24;
+  const badgeSvg = `
+    <svg width="${BADGE_SIZE}" height="${BADGE_SIZE}">
+      <defs>
+        <radialGradient id="goldGrad" cx="50%" cy="70%" r="60%">
+          <stop offset="0%" stop-color="#fffbe7" />
+          <stop offset="80%" stop-color="#FFD700" />
+          <stop offset="100%" stop-color="#e6b800" />
+        </radialGradient>
+      </defs>
+      <circle cx="70" cy="70" r="66" fill="url(#goldGrad)" stroke="#fff" stroke-width="6" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.18))" />
+      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI, Arial, sans-serif" font-size="68" font-weight="bold" fill="#000" style="letter-spacing:2px; text-shadow: 1px 2px 6px #bfae5a;">
+        ${position.toUpperCase()}
+      </text>
+    </svg>
+  `;
+
   await sharp(templatePath)
     .composite([
       {
         input: roundedPhoto,
         top: PLACEHOLDER_TOP,
         left: PLACEHOLDER_LEFT,
+      },
+      {
+        input: Buffer.from(badgeSvg),
+        top: BADGE_TOP,
+        left: BADGE_LEFT,
+        blend: "over",
       },
       {
         input: Buffer.from(textSvg),
@@ -99,150 +123,149 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
 
   res.send(`
       <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Certificate Generated!</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <style>
-          body {
-            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
-            min-height: 100vh;
-            margin: 0;
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 1rem; /* Added padding for very small screens */
-            box-sizing: border-box;
-          }
-          .container {
-            max-width: 420px;
-            margin: 40px auto;
-            background: #fff;
-            border-radius: 18px;
-            box-shadow: 0 8px 32px rgba(60, 72, 100, 0.18);
-            padding: 2.2rem 2rem 1.5rem 2rem;
-            text-align: center;
-            box-sizing: border-box; /* Include padding in total width/height */
-            width: 100%; /* Ensure it takes full width within max-width */
-          }
-          h2 {
-            color: #2d3a6e;
-            margin-bottom: 1.2rem;
-            font-size: 1.5rem;
-          }
-          img {
-            max-width: 320px;
-            width: 100%;
-            height: auto;
-            border-radius: 12px;
-            border: 1.5px solid #e0e7ff;
-            margin-bottom: 1.1rem;
-            box-shadow: 0 2px 12px rgba(76, 110, 245, 0.07);
-          }
-          button {
-            margin: 10px 0 18px 0;
-            padding: 12px 28px;
-            font-size: 1.08rem;
-            font-weight: 600;
-            background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
-            color: #fff;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
-            transition: background 0.2s, transform 0.1s;
-            width: auto; /* Allow button to size itself, or set to 100% if desired */
-            max-width: 90%; /* Prevent button from being too wide on mobile */
-          }
-          button:hover {
-            background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
-            transform: translateY(-2px) scale(1.03);
-          }
-          p {
-            margin: 0.2rem 0;
-            color: #3b4a7a;
-            word-wrap: break-word; /* Prevent long names/classes from overflowing */
-          }
-          a {
-            display: inline-block;
-            margin-top: 0.5rem;
-            color: #6c63ff;
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 1rem;
-            transition: color 0.2s;
-          }
-          a:hover {
-            color: #48b1f3;
-          }
-            
-  
-          /* Mobile-specific adjustments */
-          @media (max-width: 500px) {
-            .container {
-              padding: 1.5rem 1rem; /* More balanced padding for smaller screens */
-              margin: 20px auto; /* Adjust top/bottom margin */
-              max-width: 95vw; /* Ensure it doesn't touch edges */
-            }
-            h2 {
-              font-size: 1.3rem; /* Smaller heading on mobile */
-              margin-bottom: 0.8rem;
-            }
-            img {
-              margin-bottom: 0.8rem; /* Reduced margin below image */
-            }
-            button {
-              padding: 10px 20px; /* Smaller padding for button */
-              font-size: 0.95rem; /* Smaller font for button */
-              max-width: 100%; /* Allow button to fill container if needed */
-            }
-            p {
-              font-size: 0.9rem; /* Smaller text for name/class */
-            }
-            a {
-              font-size: 0.9rem; /* Smaller "Generate Another" link */
-            }
-          }
-  
-          @media (max-width: 320px) {
-            .container {
-              padding: 1rem 0.8rem;
-              margin: 10px auto;
-            }
-            h2 {
-              font-size: 1.2rem;
-            }
-            button {
-              padding: 8px 15px;
-              font-size: 0.9rem;
-            }
-            p {
-              font-size: 0.85rem;
-            }
-            a {
-              font-size: 0.85rem;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <h2>Generated</h2>
-          <img src="/uploads/${fileName}" alt="Certificate Preview" />
-          <br/>
-          <a href="/uploads/${fileName}" download="certificate.png">
-            <button>
-              ⬇ Download Image
-            </button>
-          </a>
-          <div style="margin-bottom: 0.7rem;"></div>
-          <p><strong>Name:</strong> ${name}</p>
-          <p><strong>Class:</strong> ${className}</p>
-          <a href="/">Generate Another</a>
-        </div>
-      </body>
-      </html>
+<html>
+<head>
+  <title>Image Generated!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+      min-height: 100vh;
+      margin: 0;
+      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .container {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 28px rgba(60, 72, 100, 0.15);
+      padding: 2rem 2.2rem 1.7rem;
+      text-align: center;
+      box-sizing: border-box;
+      width: 100%;
+      max-width: 650px; /* ⬅️ Wider on desktop */
+    }
+
+    h2 {
+      color: #2d3a6e;
+      margin-bottom: 1rem;
+      font-size: 1.7rem;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 12px;
+      border: 1.5px solid #e0e7ff;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 10px rgba(76, 110, 245, 0.08);
+    }
+
+    button {
+      margin: 0.8rem 0 1.2rem;
+      padding: 12px 28px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(76, 110, 245, 0.1);
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
+      transform: translateY(-2px) scale(1.03);
+    }
+
+    p {
+      margin: 0.3rem 0;
+      color: #3b4a7a;
+      word-break: break-word;
+      font-size: 1.05rem;
+    }
+
+    a {
+      display: inline-block;
+      color: #6c63ff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      transition: color 0.2s;
+    }
+
+    a:hover {
+      color: #48b1f3;
+    }
+
+    /* Responsive Tweaks */
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem 1.2rem;
+        max-width: 95vw;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+      }
+
+      button {
+        padding: 10px 24px;
+        font-size: 1rem;
+      }
+
+      p {
+        font-size: 0.95rem;
+      }
+
+      a {
+        font-size: 0.95rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .container {
+        padding: 1.2rem 1rem;
+      }
+
+      h2 {
+        font-size: 1.25rem;
+      }
+
+      button {
+        font-size: 0.9rem;
+        padding: 8px 20px;
+      }
+
+      p, a {
+        font-size: 0.9rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Image Generated</h2>
+    <img src="/uploads/${fileName}" alt="Image Preview" />
+    <br/>
+    <a href="/uploads/${fileName}" download="${name}.png">
+      <button>⬇ Download Image</button>
+    </a>
+    <p><strong>Name:</strong> ${name}</p>
+    <p><strong>Class:</strong> ${className}</p>
+    <p><strong>Position:</strong> ${position}</p>
+    <a href="/">Generate Another</a>
+  </div>
+</body>
+</html>
     `);
 });
 

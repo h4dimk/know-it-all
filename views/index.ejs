@@ -12,60 +12,59 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 1rem; /* Add some padding around the body for very small screens */
-        box-sizing: border-box; /* Include padding in element's total width and height */
+        padding: 1rem;
+        box-sizing: border-box;
       }
+
       .container {
         background: #fff;
         border-radius: 18px;
         box-shadow: 0 8px 32px rgba(60, 72, 100, 0.18);
-        padding: 2.5rem 2rem 2rem 2rem;
-        max-width: 400px;
+        padding: 2.5rem 2.2rem 2rem;
+        max-width: 500px; /* ✅ Wider on desktop */
         width: 100%;
-        margin: 2rem auto; /* Center the container horizontally */
+        margin: 2rem auto;
         text-align: center;
         box-sizing: border-box;
       }
+
       h1 {
         color: #2d3a6e;
         margin-bottom: 1.5rem;
         font-size: 2rem;
         letter-spacing: 1px;
       }
+
       form {
         display: flex;
         flex-direction: column;
-        gap: 1.1rem;
+        gap: 1rem;
       }
+
       label {
         font-weight: 500;
         color: #3b4a7a;
         margin-bottom: 0.3rem;
         text-align: left;
       }
-      input[type="file"] {
-        border: none;
-        background: #f3f6fa;
-        padding: 0.7rem 0.5rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        width: 100%; /* Ensure full width on mobile */
-        box-sizing: border-box; /* Include padding in element's total width */
-      }
+
+      input[type="file"],
       input[type="text"] {
-        border: 1px solid #cfd8e3;
         background: #f3f6fa;
-        padding: 0.7rem 0.5rem;
         border-radius: 8px;
+        padding: 0.7rem 0.6rem;
         font-size: 1rem;
+        border: 1px solid #cfd8e3;
+        box-sizing: border-box;
+        width: 100%;
         transition: border 0.2s;
-        width: 100%; /* Ensure full width on mobile */
-        box-sizing: border-box; /* Include padding in element's total width */
       }
+
       input[type="text"]:focus {
         border: 1.5px solid #6c63ff;
         outline: none;
       }
+
       button[type="submit"] {
         background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
         color: #fff;
@@ -77,44 +76,60 @@
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
         transition: background 0.2s, transform 0.1s;
-        width: 100%; /* Ensure full width on mobile */
-        box-sizing: border-box;
+        width: 100%;
       }
+
       button[type="submit"]:hover {
         background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
         transform: translateY(-2px) scale(1.03);
       }
-      /* Mobile-specific adjustments */
-      @media (max-width: 500px) {
+
+      /* Tablet and desktop responsiveness */
+      @media (min-width: 600px) {
         .container {
-          padding: 1.5rem 1rem; /* Slightly more padding for touch targets */
-          max-width: 95vw; /* More aggressive max-width for very small screens */
-          margin: 1rem auto; /* Adjust margin for smaller screens */
+          max-width: 560px;
+          padding: 3rem 2.5rem 2.3rem;
         }
+
         h1 {
-          font-size: 1.5rem; /* Slightly larger on mobile for better readability */
-          margin-bottom: 1rem;
+          font-size: 2.1rem;
         }
-        label {
-          font-size: 0.95rem; /* Slightly smaller labels */
-        }
-        input[type="file"],
-        input[type="text"] {
-          padding: 0.6rem 0.4rem; /* Slightly less padding */
-          font-size: 0.9rem; /* Smaller font size */
-        }
-        button[type="submit"] {
-          padding: 0.8rem 0; /* Slightly less padding */
-          font-size: 1rem; /* Smaller font size */
+
+        input,
+        button {
+          font-size: 1.1rem;
         }
       }
 
-      /* Further refinements for even smaller screens */
+      /* Mobile-specific adjustments */
+      @media (max-width: 500px) {
+        .container {
+          padding: 1.5rem 1rem;
+          max-width: 95vw;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+          margin-bottom: 1rem;
+        }
+
+        label {
+          font-size: 0.95rem;
+        }
+
+        input,
+        button {
+          font-size: 0.95rem;
+          padding: 0.7rem 0.5rem;
+        }
+      }
+
       @media (max-width: 320px) {
         .container {
           padding: 1rem 0.8rem;
           margin: 0.5rem auto;
         }
+
         h1 {
           font-size: 1.3rem;
         }
@@ -125,14 +140,17 @@
     <div class="container">
       <h1>Enter Details</h1>
       <form action="/generate" method="POST" enctype="multipart/form-data">
-        <label>Upload Photo:</label>
-        <input type="file" name="photo" required /><br />
+        <label for="photo">Upload Photo:</label>
+        <input type="file" name="photo" id="photo" required />
 
-        <label>Name:</label>
-        <input type="text" name="name" required /><br />
+        <label for="name">Name:</label>
+        <input type="text" name="name" id="name" required />
 
-        <label>Class:</label>
-        <input type="text" name="class" required /><br />
+        <label for="class">Class:</label>
+        <input type="text" name="class" id="class" required />
+
+        <label for="position">Position:</label>
+        <input type="text" name="position" id="position" required />
 
         <button type="submit">Generate Image</button>
       </form>
