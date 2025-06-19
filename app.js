@@ -68,17 +68,43 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
   const CERT_WIDTH = 768;
   const NAME_FONT_SIZE = 45;
   const CLASS_FONT_SIZE = 32;
+  const POSITION_FONT_SIZE = 38;
 
   const textSvg = `
-    <svg width="${CERT_WIDTH}" height="120">
+    <svg width="${CERT_WIDTH}" height="160" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#FFD700"/>
+          <stop offset="50%" stop-color="#FFA500"/>
+          <stop offset="100%" stop-color="#FF8C00"/>
+        </linearGradient>
+      </defs>
       <style>
-        .name { fill: #ffffff; font-size: ${NAME_FONT_SIZE}px; font-weight: bold; font-family: 'Segoe UI', Arial, sans-serif; }
-        .class { fill: #ffffff; font-size: ${CLASS_FONT_SIZE}px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; }
+        .name {
+          fill: #ffffff;
+          font-size: ${NAME_FONT_SIZE}px;
+          font-weight: bold;
+          font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .class {
+          fill: #ffffff;
+          font-size: ${CLASS_FONT_SIZE}px;
+          font-weight: 600;
+          font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .position {
+          fill: url(#goldGradient);
+          font-size: ${POSITION_FONT_SIZE}px;
+          font-weight: 700;
+          font-family: 'Segoe UI', Arial, sans-serif;
+          letter-spacing: 2px;
+          text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
       </style>
-      <text x="70%" y="33" text-anchor="middle" class="name">${name} (${className})</text>
-      <text x="70%" y="80" text-anchor="middle" class="class">${position}</text>
+      <text x="70%" y="32.5" text-anchor="middle" class="name">${name} (${className})</text>
+      <text x="70%" y="81.5" text-anchor="middle" class="position">${position.toUpperCase()}</text>
     </svg>
-  `;
+    `;
 
   await sharp(templatePath)
     .composite([
