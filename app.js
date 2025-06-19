@@ -66,8 +66,8 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     .toBuffer();
 
   const CERT_WIDTH = 768;
-  const NAME_FONT_SIZE = 48;
-  const CLASS_FONT_SIZE = 36;
+  const NAME_FONT_SIZE = 45;
+  const CLASS_FONT_SIZE = 32;
 
   const textSvg = `
     <svg width="${CERT_WIDTH}" height="120">
@@ -75,27 +75,8 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
         .name { fill: #ffffff; font-size: ${NAME_FONT_SIZE}px; font-weight: bold; font-family: 'Segoe UI', Arial, sans-serif; }
         .class { fill: #ffffff; font-size: ${CLASS_FONT_SIZE}px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; }
       </style>
-      <text x="70%" y="33" text-anchor="middle" class="name">${name}</text>
-      <text x="70%" y="80" text-anchor="middle" class="class">${className}</text>
-    </svg>
-  `;
-
-  const BADGE_SIZE = 140;
-  const BADGE_LEFT = 880;
-  const BADGE_TOP = 24;
-  const badgeSvg = `
-    <svg width="${BADGE_SIZE}" height="${BADGE_SIZE}">
-      <defs>
-        <radialGradient id="goldGrad" cx="50%" cy="70%" r="60%">
-          <stop offset="0%" stop-color="#fffbe7" />
-          <stop offset="80%" stop-color="#FFD700" />
-          <stop offset="100%" stop-color="#e6b800" />
-        </radialGradient>
-      </defs>
-      <circle cx="70" cy="70" r="66" fill="url(#goldGrad)" stroke="#fff" stroke-width="6" filter="drop-shadow(0 4px 12px rgba(0,0,0,0.18))" />
-      <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Segoe UI, Arial, sans-serif" font-size="68" font-weight="bold" fill="#000" style="letter-spacing:2px; text-shadow: 1px 2px 6px #bfae5a;">
-        ${position.toUpperCase()}
-      </text>
+      <text x="70%" y="33" text-anchor="middle" class="name">${name} (${className})</text>
+      <text x="70%" y="80" text-anchor="middle" class="class">${position}</text>
     </svg>
   `;
 
@@ -105,12 +86,6 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
         input: roundedPhoto,
         top: PLACEHOLDER_TOP,
         left: PLACEHOLDER_LEFT,
-      },
-      {
-        input: Buffer.from(badgeSvg),
-        top: BADGE_TOP,
-        left: BADGE_LEFT,
-        blend: "over",
       },
       {
         input: Buffer.from(textSvg),
