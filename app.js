@@ -65,12 +65,10 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     .png()
     .toBuffer();
 
-  // --- SVG for Name and Class (centered, large, bold, modern font) ---
-  const CERT_WIDTH = 768; // Adjust if your template is a different width
+  const CERT_WIDTH = 768;
   const NAME_FONT_SIZE = 48;
   const CLASS_FONT_SIZE = 36;
-  const NAME_Y = 860; // Y position for name (adjust as needed)
-  const CLASS_Y = 920; // Y position for class (adjust as needed)
+ 
 
   const textSvg = `
     <svg width="${CERT_WIDTH}" height="120">
@@ -83,7 +81,6 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     </svg>
   `;
 
-  // --- Composite photo and text onto the template ---
   await sharp(templatePath)
     .composite([
       {
@@ -93,7 +90,7 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
       },
       {
         input: Buffer.from(textSvg),
-        top: 820, // Place the SVG near the bottom (adjust as needed)
+        top: 820,
         left: 0,
         blend: "over",
       },
@@ -101,50 +98,152 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     .toFile(outputPath);
 
   res.send(`
-    <div style="
-      max-width: 420px;
-      margin: 40px auto;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 8px 32px rgba(60, 72, 100, 0.18);
-      padding: 2.2rem 2rem 1.5rem 2rem;
-      text-align: center;
-      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
-    ">
-      <h2 style="color: #2d3a6e; margin-bottom: 1.2rem; font-size: 1.5rem;">Generated</h2>
-      <img src="/uploads/${fileName}" style="max-width: 320px; width: 100%; height: auto; border-radius: 12px; border: 1.5px solid #e0e7ff; margin-bottom: 1.1rem; box-shadow: 0 2px 12px rgba(76, 110, 245, 0.07);" alt="Certificate Preview" />
-      <br/>
-      <a href="/uploads/${fileName}" download="certificate.png">
-        <button style="
-          margin: 10px 0 18px 0;
-          padding: 12px 28px;
-          font-size: 1.08rem;
-          font-weight: 600;
-          background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
-          color: #fff;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
-          transition: background 0.2s, transform 0.1s;
-        " onmouseover="this.style.background='linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%)';this.style.transform='translateY(-2px) scale(1.03)';" onmouseout="this.style.background='linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%)';this.style.transform='none';">
-          ⬇ Download Certificate
-        </button>
-      </a>
-      <div style="margin-bottom: 0.7rem;"></div>
-      <p style="margin: 0.2rem 0; color: #3b4a7a;"><strong>Name:</strong> ${name}</p>
-      <p style="margin: 0.2rem 0 1.2rem 0; color: #3b4a7a;"><strong>Class:</strong> ${className}</p>
-      <a href="/" style="
-        display: inline-block;
-        margin-top: 0.5rem;
-        color: #6c63ff;
-        text-decoration: none;
-        font-weight: 500;
-        font-size: 1rem;
-        transition: color 0.2s;
-      " onmouseover="this.style.color='#48b1f3'" onmouseout="this.style.color='#6c63ff'">Generate Another</a>
-    </div>
-  `);
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Certificate Generated!</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <style>
+          body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem; /* Added padding for very small screens */
+            box-sizing: border-box;
+          }
+          .container {
+            max-width: 420px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 18px;
+            box-shadow: 0 8px 32px rgba(60, 72, 100, 0.18);
+            padding: 2.2rem 2rem 1.5rem 2rem;
+            text-align: center;
+            box-sizing: border-box; /* Include padding in total width/height */
+            width: 100%; /* Ensure it takes full width within max-width */
+          }
+          h2 {
+            color: #2d3a6e;
+            margin-bottom: 1.2rem;
+            font-size: 1.5rem;
+          }
+          img {
+            max-width: 320px;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1.5px solid #e0e7ff;
+            margin-bottom: 1.1rem;
+            box-shadow: 0 2px 12px rgba(76, 110, 245, 0.07);
+          }
+          button {
+            margin: 10px 0 18px 0;
+            padding: 12px 28px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
+            transition: background 0.2s, transform 0.1s;
+            width: auto; /* Allow button to size itself, or set to 100% if desired */
+            max-width: 90%; /* Prevent button from being too wide on mobile */
+          }
+          button:hover {
+            background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
+            transform: translateY(-2px) scale(1.03);
+          }
+          p {
+            margin: 0.2rem 0;
+            color: #3b4a7a;
+            word-wrap: break-word; /* Prevent long names/classes from overflowing */
+          }
+          a {
+            display: inline-block;
+            margin-top: 0.5rem;
+            color: #6c63ff;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: color 0.2s;
+          }
+          a:hover {
+            color: #48b1f3;
+          }
+            
+  
+          /* Mobile-specific adjustments */
+          @media (max-width: 500px) {
+            .container {
+              padding: 1.5rem 1rem; /* More balanced padding for smaller screens */
+              margin: 20px auto; /* Adjust top/bottom margin */
+              max-width: 95vw; /* Ensure it doesn't touch edges */
+            }
+            h2 {
+              font-size: 1.3rem; /* Smaller heading on mobile */
+              margin-bottom: 0.8rem;
+            }
+            img {
+              margin-bottom: 0.8rem; /* Reduced margin below image */
+            }
+            button {
+              padding: 10px 20px; /* Smaller padding for button */
+              font-size: 0.95rem; /* Smaller font for button */
+              max-width: 100%; /* Allow button to fill container if needed */
+            }
+            p {
+              font-size: 0.9rem; /* Smaller text for name/class */
+            }
+            a {
+              font-size: 0.9rem; /* Smaller "Generate Another" link */
+            }
+          }
+  
+          @media (max-width: 320px) {
+            .container {
+              padding: 1rem 0.8rem;
+              margin: 10px auto;
+            }
+            h2 {
+              font-size: 1.2rem;
+            }
+            button {
+              padding: 8px 15px;
+              font-size: 0.9rem;
+            }
+            p {
+              font-size: 0.85rem;
+            }
+            a {
+              font-size: 0.85rem;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h2>Generated</h2>
+          <img src="/uploads/${fileName}" alt="Certificate Preview" />
+          <br/>
+          <a href="/uploads/${fileName}" download="certificate.png">
+            <button>
+              ⬇ Download Image
+            </button>
+          </a>
+          <div style="margin-bottom: 0.7rem;"></div>
+          <p><strong>Name:</strong> ${name}</p>
+          <p><strong>Class:</strong> ${className}</p>
+          <a href="/">Generate Another</a>
+        </div>
+      </body>
+      </html>
+    `);
 });
 
 const PORT = 3000;

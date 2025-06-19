@@ -2,6 +2,7 @@
 <html>
   <head>
     <title>Know-it-All Certificate Generator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <style>
       body {
         background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
@@ -11,6 +12,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 1rem; /* Add some padding around the body for very small screens */
+        box-sizing: border-box; /* Include padding in element's total width and height */
       }
       .container {
         background: #fff;
@@ -19,8 +22,9 @@
         padding: 2.5rem 2rem 2rem 2rem;
         max-width: 400px;
         width: 100%;
-        margin: 2rem 0;
+        margin: 2rem auto; /* Center the container horizontally */
         text-align: center;
+        box-sizing: border-box;
       }
       h1 {
         color: #2d3a6e;
@@ -45,6 +49,8 @@
         padding: 0.7rem 0.5rem;
         border-radius: 8px;
         font-size: 1rem;
+        width: 100%; /* Ensure full width on mobile */
+        box-sizing: border-box; /* Include padding in element's total width */
       }
       input[type="text"] {
         border: 1px solid #cfd8e3;
@@ -53,6 +59,8 @@
         border-radius: 8px;
         font-size: 1rem;
         transition: border 0.2s;
+        width: 100%; /* Ensure full width on mobile */
+        box-sizing: border-box; /* Include padding in element's total width */
       }
       input[type="text"]:focus {
         border: 1.5px solid #6c63ff;
@@ -69,15 +77,43 @@
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
         transition: background 0.2s, transform 0.1s;
+        width: 100%; /* Ensure full width on mobile */
+        box-sizing: border-box;
       }
       button[type="submit"]:hover {
         background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
         transform: translateY(-2px) scale(1.03);
       }
+      /* Mobile-specific adjustments */
       @media (max-width: 500px) {
         .container {
-          padding: 1.2rem 0.5rem 1.5rem 0.5rem;
-          max-width: 98vw;
+          padding: 1.5rem 1rem; /* Slightly more padding for touch targets */
+          max-width: 95vw; /* More aggressive max-width for very small screens */
+          margin: 1rem auto; /* Adjust margin for smaller screens */
+        }
+        h1 {
+          font-size: 1.5rem; /* Slightly larger on mobile for better readability */
+          margin-bottom: 1rem;
+        }
+        label {
+          font-size: 0.95rem; /* Slightly smaller labels */
+        }
+        input[type="file"],
+        input[type="text"] {
+          padding: 0.6rem 0.4rem; /* Slightly less padding */
+          font-size: 0.9rem; /* Smaller font size */
+        }
+        button[type="submit"] {
+          padding: 0.8rem 0; /* Slightly less padding */
+          font-size: 1rem; /* Smaller font size */
+        }
+      }
+
+      /* Further refinements for even smaller screens */
+      @media (max-width: 320px) {
+        .container {
+          padding: 1rem 0.8rem;
+          margin: 0.5rem auto;
         }
         h1 {
           font-size: 1.3rem;
@@ -98,7 +134,7 @@
         <label>Class:</label>
         <input type="text" name="class" required /><br />
 
-        <button type="submit">Generate Certificate</button>
+        <button type="submit">Generate Image</button>
       </form>
     </div>
   </body>
