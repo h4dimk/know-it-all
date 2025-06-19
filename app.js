@@ -18,14 +18,14 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 app.get("/", (req, res) => {
-  res.render("index"); 
+  res.render("index");
 });
 
 app.post("/generate", upload.single("photo"), async (req, res) => {
   const { name, class: className } = req.body;
   const photoBuffer = req.file.buffer;
 
-  const templatePath = path.join(__dirname, "public", "template.png");
+  const templatePath = path.join(__dirname, "public", "template.png"); // Corrected template name
   const fileName = `output-${Date.now()}.png`;
   const outputPath = path.join("public", "uploads", fileName);
 
@@ -65,15 +65,37 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     .png()
     .toBuffer();
 
-  const debugPhotoPath = `public/uploads/debug-rounded-${Date.now()}.png`;
-  await sharp(roundedPhoto).toFile(debugPhotoPath);
+  // --- SVG for Name and Class (centered, large, bold, modern font) ---
+  const CERT_WIDTH = 768; // Adjust if your template is a different width
+  const NAME_FONT_SIZE = 48;
+  const CLASS_FONT_SIZE = 36;
+  const NAME_Y = 860; // Y position for name (adjust as needed)
+  const CLASS_Y = 920; // Y position for class (adjust as needed)
 
+  const textSvg = `
+    <svg width="${CERT_WIDTH}" height="120">
+      <style>
+        .name { fill: #ffffff; font-size: ${NAME_FONT_SIZE}px; font-weight: bold; font-family: 'Segoe UI', Arial, sans-serif; }
+        .class { fill: #ffffff; font-size: ${CLASS_FONT_SIZE}px; font-weight: 600; font-family: 'Segoe UI', Arial, sans-serif; }
+      </style>
+      <text x="70%" y="33" text-anchor="middle" class="name">${name}</text>
+      <text x="70%" y="80" text-anchor="middle" class="class">${className}</text>
+    </svg>
+  `;
+
+  // --- Composite photo and text onto the template ---
   await sharp(templatePath)
     .composite([
       {
         input: roundedPhoto,
         top: PLACEHOLDER_TOP,
         left: PLACEHOLDER_LEFT,
+      },
+      {
+        input: Buffer.from(textSvg),
+        top: 820, // Place the SVG near the bottom (adjust as needed)
+        left: 0,
+        blend: "over",
       },
     ])
     .toFile(outputPath);
