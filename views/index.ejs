@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Know-it-All Certificate Generator</title>
+    <style>
+      body {
+        background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+        min-height: 100vh;
+        margin: 0;
+        font-family: "Segoe UI", "Roboto", Arial, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .container {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(60, 72, 100, 0.18);
+        padding: 2.5rem 2rem 2rem 2rem;
+        max-width: 400px;
+        width: 100%;
+        margin: 2rem 0;
+        text-align: center;
+      }
+      h1 {
+        color: #2d3a6e;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        letter-spacing: 1px;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.1rem;
+      }
+      label {
+        font-weight: 500;
+        color: #3b4a7a;
+        margin-bottom: 0.3rem;
+        text-align: left;
+      }
+      input[type="file"] {
+        border: none;
+        background: #f3f6fa;
+        padding: 0.7rem 0.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+      }
+      input[type="text"] {
+        border: 1px solid #cfd8e3;
+        background: #f3f6fa;
+        padding: 0.7rem 0.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border 0.2s;
+      }
+      input[type="text"]:focus {
+        border: 1.5px solid #6c63ff;
+        outline: none;
+      }
+      button[type="submit"] {
+        background: linear-gradient(90deg, #6c63ff 0%, #48b1f3 100%);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        padding: 0.9rem 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(76, 110, 245, 0.08);
+        transition: background 0.2s, transform 0.1s;
+      }
+      button[type="submit"]:hover {
+        background: linear-gradient(90deg, #48b1f3 0%, #6c63ff 100%);
+        transform: translateY(-2px) scale(1.03);
+      }
+      @media (max-width: 500px) {
+        .container {
+          padding: 1.2rem 0.5rem 1.5rem 0.5rem;
+          max-width: 98vw;
+        }
+        h1 {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Enter Details</h1>
+      <form action="/generate" method="POST" enctype="multipart/form-data">
+        <label>Upload Photo:</label>
+        <input type="file" name="photo" required /><br />
+
+        <label>Name:</label>
+        <input type="text" name="name" required /><br />
+
+        <label>Class:</label>
+        <input type="text" name="class" required /><br />
+
+        <button type="submit">Generate Certificate</button>
+      </form>
+    </div>
+  </body>
+</html>
