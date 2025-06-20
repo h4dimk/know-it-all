@@ -188,6 +188,7 @@ app.post("/generate", (req, res, next) => {
   `;
 
     const roundedPhoto = await sharp(photoBuffer)
+      .rotate()
       .resize(PLACEHOLDER_WIDTH, PLACEHOLDER_HEIGHT)
       .composite([
         {
