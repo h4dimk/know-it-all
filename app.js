@@ -15,27 +15,160 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 30 * 1024 * 1024,
+  },
+});
 
 app.get("/", (req, res) => {
   res.render("index");
 });
 
-app.post("/generate", upload.single("photo"), async (req, res) => {
-  const { name, class: className, position } = req.body;
-  const photoBuffer = req.file.buffer;
+app.post("/generate", (req, res, next) => {
+  upload.single("photo")(req, res, async function (err) {
+    if (err instanceof multer.MulterError && err.code === "LIMIT_FILE_SIZE") {
+      return res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Upload Error</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <style>
+        body {
+          background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+          min-height: 100vh;
+          margin: 0;
+          font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          box-sizing: border-box;
+        }
+        .container {
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 8px 24px rgba(60, 72, 100, 0.15);
+          padding: 2rem 2.5rem;
+          max-width: 480px;
+          width: 100%;
+          text-align: center;
+        }
+        h2 {
+          color: #d9534f;
+          font-size: 1.6rem;
+          margin-bottom: 0.6rem;
+        }
+        p {
+          color: #444;
+          font-size: 1.05rem;
+          margin-bottom: 1.5rem;
+        }
+        a {
+          display: inline-block;
+          background: linear-gradient(90deg, #6c63ff, #48b1f3);
+          color: #fff;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: transform 0.2s, background 0.2s;
+        }
+        a:hover {
+          background: linear-gradient(90deg, #48b1f3, #6c63ff);
+          transform: translateY(-2px) scale(1.03);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>🚫 File Too Large!</h2>
+        <p>Please upload an image smaller than <strong>30MB</strong>.</p>
+        <a href="/">⬅ Go Back</a>
+      </div>
+    </body>
+    </html>
+  `);
+    } else if (err) {
+      return res.send(`
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <title>Upload Error</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <style>
+        body {
+          background: linear-gradient(135deg, #e0e7ff 0%, #f0f4ff 100%);
+          min-height: 100vh;
+          margin: 0;
+          font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          box-sizing: border-box;
+        }
+        .container {
+          background: #fff;
+          border-radius: 16px;
+          box-shadow: 0 8px 24px rgba(60, 72, 100, 0.15);
+          padding: 2rem 2.5rem;
+          max-width: 480px;
+          width: 100%;
+          text-align: center;
+        }
+        h2 {
+          color: #d9534f;
+          font-size: 1.6rem;
+          margin-bottom: 0.6rem;
+        }
+        p {
+          color: #444;
+          font-size: 1.05rem;
+          margin-bottom: 1.5rem;
+        }
+        a {
+          display: inline-block;
+          background: linear-gradient(90deg, #6c63ff, #48b1f3);
+          color: #fff;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 8px;
+          font-weight: 600;
+          transition: transform 0.2s, background 0.2s;
+        }
+        a:hover {
+          background: linear-gradient(90deg, #48b1f3, #6c63ff);
+          transform: translateY(-2px) scale(1.03);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <h2>❌ Upload Error</h2>
+        <p>${err.message}</p>
+        <a href="/">⬅ Go Back</a>
+      </div>
+    </body>
+    </html>
+  `);
+    }
+    const { name, class: className, position } = req.body;
+    const photoBuffer = req.file.buffer;
 
-  const templatePath = path.join(__dirname, "public", "template.png");
-  const fileName = `output-${Date.now()}.png`;
-  const outputPath = path.join("public", "uploads", fileName);
+    const templatePath = path.join(__dirname, "public", "template.png");
+    const fileName = `output-${Date.now()}.png`;
+    const outputPath = path.join("public", "uploads", fileName);
 
-  const PLACEHOLDER_WIDTH = Math.round(393 * 0.95);
-  const PLACEHOLDER_HEIGHT = Math.round(492 * 0.95);
-  const PLACEHOLDER_LEFT = 345 + Math.round((393 - PLACEHOLDER_WIDTH) / 2);
-  const PLACEHOLDER_TOP = 309 + Math.round((492 - PLACEHOLDER_HEIGHT) / 2);
-  const CORNER_RADIUS = 40;
+    const PLACEHOLDER_WIDTH = Math.round(393 * 0.95);
+    const PLACEHOLDER_HEIGHT = Math.round(492 * 0.95);
+    const PLACEHOLDER_LEFT = 345 + Math.round((393 - PLACEHOLDER_WIDTH) / 2);
+    const PLACEHOLDER_TOP = 309 + Math.round((492 - PLACEHOLDER_HEIGHT) / 2);
+    const CORNER_RADIUS = 40;
 
-  const svgMask = `
+    const svgMask = `
   <svg width="${PLACEHOLDER_WIDTH}" height="${PLACEHOLDER_HEIGHT}">
     <path
       d="
@@ -54,23 +187,23 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
   </svg>
   `;
 
-  const roundedPhoto = await sharp(photoBuffer)
-    .resize(PLACEHOLDER_WIDTH, PLACEHOLDER_HEIGHT)
-    .composite([
-      {
-        input: Buffer.from(svgMask),
-        blend: "dest-in",
-      },
-    ])
-    .png()
-    .toBuffer();
+    const roundedPhoto = await sharp(photoBuffer)
+      .resize(PLACEHOLDER_WIDTH, PLACEHOLDER_HEIGHT)
+      .composite([
+        {
+          input: Buffer.from(svgMask),
+          blend: "dest-in",
+        },
+      ])
+      .png()
+      .toBuffer();
 
-  const CERT_WIDTH = 768;
-  const NAME_FONT_SIZE = 45;
-  const CLASS_FONT_SIZE = 32;
-  const POSITION_FONT_SIZE = 38;
+    const CERT_WIDTH = 768;
+    const NAME_FONT_SIZE = 45;
+    const CLASS_FONT_SIZE = 32;
+    const POSITION_FONT_SIZE = 38;
 
-  const textSvg = `
+    const textSvg = `
     <svg width="${CERT_WIDTH}" height="160" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -106,23 +239,23 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
     </svg>
     `;
 
-  await sharp(templatePath)
-    .composite([
-      {
-        input: roundedPhoto,
-        top: PLACEHOLDER_TOP,
-        left: PLACEHOLDER_LEFT,
-      },
-      {
-        input: Buffer.from(textSvg),
-        top: 820,
-        left: 0,
-        blend: "over",
-      },
-    ])
-    .toFile(outputPath);
+    await sharp(templatePath)
+      .composite([
+        {
+          input: roundedPhoto,
+          top: PLACEHOLDER_TOP,
+          left: PLACEHOLDER_LEFT,
+        },
+        {
+          input: Buffer.from(textSvg),
+          top: 820,
+          left: 0,
+          blend: "over",
+        },
+      ])
+      .toFile(outputPath);
 
-  res.send(`
+    res.send(`
       <!DOCTYPE html>
 <html>
 <head>
@@ -268,6 +401,7 @@ app.post("/generate", upload.single("photo"), async (req, res) => {
 </body>
 </html>
     `);
+  });
 });
 
 const PORT = 3000;
