@@ -198,7 +198,7 @@ app.post("/generate", (req, res, next) => {
       .png()
       .toBuffer();
 
-    const CERT_WIDTH = 768;
+    const CERT_WIDTH = 1050;
     const NAME_FONT_SIZE = 45;
     const CLASS_FONT_SIZE = 32;
     const POSITION_FONT_SIZE = 38;
@@ -215,6 +215,7 @@ app.post("/generate", (req, res, next) => {
       <style>
         .name {
           fill: #ffffff;
+          text-align:center;
           font-size: ${NAME_FONT_SIZE}px;
           font-weight: bold;
           font-family: 'Segoe UI', Arial, sans-serif;
@@ -227,6 +228,7 @@ app.post("/generate", (req, res, next) => {
         }
         .position {
           fill: url(#goldGradient);
+          text-align:center;
           font-size: ${POSITION_FONT_SIZE}px;
           font-weight: 700;
           font-family: 'Segoe UI', Arial, sans-serif;
@@ -234,8 +236,8 @@ app.post("/generate", (req, res, next) => {
           text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
       </style>
-      <text x="70%" y="32.5" text-anchor="middle" class="name">${name} (${className})</text>
-      <text x="70%" y="81.5" text-anchor="middle" class="position">${position.toUpperCase()}</text>
+      <text x="50%" y="32.5" text-anchor="middle" class="name">${name} (${className})</text>
+      <text x="50%" y="81.5" text-anchor="middle" class="position">${position.toUpperCase()}</text>
     </svg>
     `;
 
